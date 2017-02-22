@@ -1,11 +1,12 @@
 const fetch = require('node-fetch')
 
+const prefix = "http://swapi.co"
 const store = {}
 
 module.exports = async (req, res) => {
   if (req.url === "/favicon.ico") return 'go away chrome'
   if (req.url === "/admin") return displayAdmin()
-  const apiUrl = `http://swapi.co${req.url}`
+  const apiUrl = `${prefix}${req.url}`
   if (store[apiUrl]) return getFromStore(apiUrl)
   return fetch(apiUrl)
     .then(raw => raw.json())
@@ -26,11 +27,11 @@ const getFromStore = (url) => {
 }
 
 const displayAdmin = () => {
-  return JSON.stringify(
-    Object.keys(store)
+  return Object.keys(store)
       .map(url => ({url, count: store[url].counter}))
       .sort(sortByCount)
-  )
+      .map(obj => `URL: ${obj.url} count: ${obj.count}`)
+      .join("\n")
 }
 
 const sortByCount = (a, b) => {
